@@ -46,7 +46,7 @@ namespace ComDemoProject
             sp2.DataReceived += new SerialDataReceivedEventHandler(sp2_DataReceived);
 
         }
-        //byte数组转16进制
+         //byte数组转16进制
         public  static string  byteToHexString(byte[] rd)
         {
             StringBuilder sb = new StringBuilder(rd.Length * 3);
@@ -57,7 +57,7 @@ namespace ComDemoProject
             return sb.ToString().ToUpper();
         }
 
-        //完成子板号与坐标对应方法
+         //完成子板号与坐标对应方法
          public static string[] getChildNum(string[] str)
            {
             string xPoint = "";
