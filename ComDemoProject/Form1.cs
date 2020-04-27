@@ -153,8 +153,6 @@ namespace ComDemoProject
         string dataBasePoints = "";//数据库坐标
         string strs = "";//回复FF的子板号
         string childRandnum = "";//手动定位成功的子板号
-        ArrayList listPortOne = new ArrayList();
-        bool isFinish = true;
         //扫码枪串口1接收数据
         private void sp_DataReceived(object sender, EventArgs e)
         {
@@ -164,45 +162,14 @@ namespace ComDemoProject
                 try
                 {
                     dataBasePoints = "";
+                    lightSet.ForeColor = Color.Black;
                     if (radioAuto.Checked)
                     {
-                        bool isNextPcb = true;//标记在上一个板子过程中接收到下一块板子是否取消上一块板子的流程立即执行下一块板子
+                        childNumList.Clear();
                         RexvData.Text = "";
                         Byte[] rb = new Byte[sp.BytesToRead];
                         UTF8Encoding utf = new UTF8Encoding();
-                        sp.Read(rb, 0, rb.Length);//接收到数据从缓冲区以字节数组形式读出来
-                        listPortOne.Add(rb);
-                        if (listPortOne.Count > 1) isNextPcb = CompareArray(listPortOne[0] as byte[], listPortOne[1] as byte[]);
-                        if (!isNextPcb)
-                        {
-                            MessageBoxButtons isNextBtn = MessageBoxButtons.OKCancel;
-                            DialogResult drIsNext = MessageBox.Show("检测到新的PCB板确定立即检测吗？", "提示", isNextBtn);
-                            if (drIsNext == DialogResult.OK)
-                            {
-                                timer1.Enabled = false;
-                                timer1.Stop();
-                                isFinish = true;
-                            }
-                            else
-                            {
-                                rb = listPortOne[0] as byte[];
-                                isFinish = false;
-                                listPortOne.RemoveAt(1);
-                            }
-                        }
-                        else
-                        {
-                            if (listPortOne.Count > 1) { 
-                                MessageBox.Show("检测到这是同一PCB块板");
-                            rb = listPortOne[0] as byte[];
-                            isFinish = false;
-                                RexvData.Text = utf.GetString(rb).Split(',')[0].ToString();
-                            //listPortOne.RemoveAt(1);
-                            }
-                        }
-
-                        if (listPortOne.Count > 1) listPortOne.RemoveAt(0);
-                        if (isFinish) { 
+                        sp.Read(rb, 0, rb.Length);//接收到数据从缓冲区以字节数组形式读出来                                                                      
                         string[] ds = utf.GetString(rb).Split(',');
                         string machineNum = ds[0];
                         string pointNumber = ds[1].Substring(0, 2);
@@ -251,13 +218,11 @@ namespace ComDemoProject
                             string[] adressPointData = rder[1].ToString().Split(',');
                             // string pointNum = msr[0].ToString();
                             string[] adressPoint1 = getChildNum(adressPointData);
-                            MessageBox.Show("长度为" + adressPoint1.Length + "[0]为" + adressPoint1[0] + "[1]为" + adressPoint1[1] + "[4]为" + adressPoint1[4]);
                             //adressPoint1 = adressPoint1.Where(sP => !string.IsNullOrEmpty(sP)).ToArray();
                             for (int i = 0; i < adressPoint1.Length; i++)
                             {
                                 if (!string.IsNullOrEmpty(adressPoint1[i]))
                                 {
-                                    MessageBox.Show("第" + (i + 1) + "组为：" + adressPoint1[i]);
                                     PortOrder po = new PortOrder(Direction.AB, "02", "0" + (i + 1), "0" + adressPoint1[i].Length / 4, adressPoint1[i]);
                                     childNumList.Add("0" + (i + 1));
                                     sp2.Write(hexToString(po.getConnOrder()), 0, hexToString(po.getConnOrder()).Length);
@@ -281,7 +246,6 @@ namespace ComDemoProject
                                     string addSql = "insert into machines(machineId,childNumber,adressNumber) values('" + machineNum + "','" + pointNumber + "','" + newStyle + "')";
                                     DataBaseSys.ExecuteNonQuery(addSql);
                                     MessageBox.Show("添加成功！");
-                                    listPortOne.Clear();
                                 }
                                 catch (Exception)
                                 {
@@ -290,7 +254,6 @@ namespace ComDemoProject
                             }
                             sp.DiscardInBuffer();
                         }
-                    }
                 }
                 }
                 catch (Exception x)
@@ -298,6 +261,16 @@ namespace ComDemoProject
                     MessageBox.Show("出现异常错误！" + x.ToString());
                 }
             }));
+        }
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            //定时向子板发送05自动读取命令以收到错误坐标指令
+            for (int i = 0; i < childNumList.Count; i++)
+            {
+                //System.Threading.Thread.Sleep(2000);
+                PortOrder po = new PortOrder(Direction.AB, "05", childNumList[i].ToString(), "", "");
+                sp2.Write(hexToString(po.getConnOrder()), 0, hexToString(po.getConnOrder()).Length);
+            }
         }
 
         string adressPoints = "";//记录回复03带坐标的板子所有坐标以存入数据库
@@ -315,12 +288,10 @@ namespace ComDemoProject
                 //手动状态下
                 if (radioHand.Checked)
                 {
-                    MessageBox.Show(rb[3].ToString());
                     //存储回复FF信号的板子编号（04）
                     if (rb[3] == 0XFF)
                     {
                         strs += rb[2].ToString();
-                        MessageBox.Show("收到的板子回复的板子号为" + strs);
                     }
                     else//(03)
                     {
@@ -374,7 +345,6 @@ namespace ComDemoProject
                     b++;
                     if (rb[3] == 0X00)//纠错成功恢复00（05）
                     {
-                        MessageBox.Show("进入00");
                         childNumList.Remove("0" + rb[2]);
                         b = b - 1;                    
                         if (childNumList.Count==0)
@@ -382,19 +352,17 @@ namespace ComDemoProject
                             MessageBox.Show("STOP");
                             for (int k = 0; k < dataAdressView1.ColumnCount; k++)
                             {
-                                dataAdressView1.Rows[0].Cells[k].Style.ForeColor = Color.Black;
-                                timer1.Enabled = false;
-                                timer1.Stop();
-                                lightSet.ForeColor = Color.Green;
-                                isFinish = true;
-                                childNumList.Clear();
+                                dataAdressView1.Rows[0].Cells[k].Style.ForeColor = Color.Black;                                                                                              
                             }
+                            lightSet.ForeColor = Color.Green;
+                            timer1.Enabled = false;
+                            timer1.Stop();
+                            childNumList.Clear();
                             return;
                         }                                                 
                         }
                     else//有错误子板回复带坐标的（05)
                     {
-                        MessageBox.Show("进入有错误子板回复情况");
                         string[] pointNums = Regex.Replace(dataBasePoints, @"(\w{4})", "$1,").Trim(',').Split(',');//把数据库查的坐标以一组4位以逗号分隔
                         string xYPoints = childToPcPointChange(rb);
                         autoAdressPoints += xYPoints;
@@ -440,11 +408,9 @@ namespace ComDemoProject
                                 {
                                     dataAdressView1.Rows[0].Cells[k].Style.ForeColor = Color.Red;
                                     lightSet.ForeColor = Color.Red;
-                                    MessageBox.Show("一样变红");
                                     break;
                                 }
                                 else dataAdressView1.Rows[0].Cells[k].Style.ForeColor = Color.Black;
-                                MessageBox.Show("不一样变黑");
                             }
                         }
                         autoAdressPoints = "";
@@ -455,16 +421,7 @@ namespace ComDemoProject
                 sp2.DiscardInBuffer();
             }));
         }  
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            //定时向子板发送05自动读取命令以收到错误坐标指令
-            for (int i = 0; i < childNumList.Count; i++)
-            {
-                //System.Threading.Thread.Sleep(2000);
-                PortOrder po = new PortOrder(Direction.AB, "05", childNumList[i].ToString(), "", "");
-                sp2.Write(hexToString(po.getConnOrder()),0, hexToString(po.getConnOrder()).Length);
-            }
-        }      
+         
         public static byte[] hexToString(string s)
         {
             byte[] btr = new byte[s.Length / 2];
@@ -477,21 +434,25 @@ namespace ComDemoProject
         }
         private void insertButton_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(strs);
-            //strs共享的板子数据编号
+          
             if (RexvData.Text == "")
             {
-                MessageBox.Show("机种号不能为空！请输入机种号.");
+                MessageBox.Show("机种号不能为空！请输入机种号");
             }
             else
             {
-                for (int i = 0; i < strs.Length; i++)
-            {
+                string sql = "SELECT id FROM machines WHERE machineId='" + RexvData.Text + "'";
+                MySqlDataReader msdr = DataBaseSys.GetDataReaderValue(sql);
+                if (!msdr.HasRows) { 
+                for (int i = 0; i < strs.Length; i++) //strs共享的板子数据编号
+                {
                     System.Threading.Thread.Sleep(2000);
                     PortOrder po = new PortOrder(Direction.AB, "03","0"+strs[i],"","");
                 byte[] bt = hexToString(po.getConnOrder());
                 sp2.Write(bt, 0, bt.Length);
-           }
+                }
+                }
+                else MessageBox.Show("机种号重复，请重新输入机种号！");
             }
         }
 
@@ -504,6 +465,7 @@ namespace ComDemoProject
         {
             strs = "";
             childRandnum = "";
+            lightSet.ForeColor = Color.Black;
                 for (int i = 1; i < 9; i++)
                 {
                     System.Threading.Thread.Sleep(1000);

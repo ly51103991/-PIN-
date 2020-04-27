@@ -138,8 +138,10 @@
             // 
             // RexvData
             // 
+            this.RexvData.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.RexvData.Location = new System.Drawing.Point(124, 20);
             this.RexvData.Name = "RexvData";
+            this.RexvData.ReadOnly = true;
             this.RexvData.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.RexvData.Size = new System.Drawing.Size(143, 21);
             this.RexvData.TabIndex = 0;
