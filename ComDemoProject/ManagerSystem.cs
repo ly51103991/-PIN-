@@ -131,15 +131,24 @@ namespace ComDemoProject
                                     }
                                     if (hashSet.Count != isSamePoints.Length) isSame = false;
                                     if (isSame) {
-                                    string pointNum = (styleSet.Length / 2) < 10 ? "0" + (styleSet.Length / 2) : (styleSet.Length / 2).ToString();
-                                    //更新语句
-                                    string sql = "update machines set childNumber='" + pointNum + "' ,adressNumber='" + newPoints + "' where id= '" + id + "'";
-                                    MessageBox.Show(sql);
-                                    DataBaseSys.ExecuteNonQuery(sql);
-                                    adressDataView.CurrentRow.Cells[2].Value = pointNum;
-                                    adressDataView.CurrentRow.Cells[3].Value = newPoints;
-                                    adressDataView.CurrentRow.Cells[3].ReadOnly = true;
-                                    MessageBox.Show("修改成功！");
+                                        MessageBoxButtons messButtonUpdate = MessageBoxButtons.OKCancel;
+                                        DialogResult dr = MessageBox.Show("确定修改吗?","提示", messButtonUpdate);
+                                        if (dr == DialogResult.OK)
+                                        {
+                                            string pointNum = (styleSet.Length / 2) < 10 ? "0" + (styleSet.Length / 2) : (styleSet.Length / 2).ToString();
+                                            //更新语句
+                                            string sql = "update machines set childNumber='" + pointNum + "' ,adressNumber='" + newPoints + "' where id= '" + id + "'";
+                                            DataBaseSys.ExecuteNonQuery(sql);
+                                            adressDataView.CurrentRow.Cells[2].Value = pointNum;
+                                            adressDataView.CurrentRow.Cells[3].Value = newPoints;
+                                            adressDataView.CurrentRow.Cells[3].ReadOnly = true;
+                                            MessageBox.Show("修改成功！");
+                                        }
+                                        else
+                                        {
+                                            adressDataView.CurrentRow.Cells[3].Value = myPoint;
+                                            isSame = true;
+                                        }
                                     }
                                     else
                                     {                                        

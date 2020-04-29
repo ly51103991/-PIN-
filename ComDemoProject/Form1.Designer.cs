@@ -45,12 +45,11 @@
             // 
             // buttonUpdate
             // 
-            this.buttonUpdate.Enabled = false;
-            this.buttonUpdate.Location = new System.Drawing.Point(72, 147);
+            this.buttonUpdate.Location = new System.Drawing.Point(274, 167);
             this.buttonUpdate.Name = "buttonUpdate";
             this.buttonUpdate.Size = new System.Drawing.Size(67, 30);
             this.buttonUpdate.TabIndex = 20;
-            this.buttonUpdate.Text = "修改";
+            this.buttonUpdate.Text = "后台管理";
             this.buttonUpdate.UseVisualStyleBackColor = true;
             this.buttonUpdate.Visible = false;
             this.buttonUpdate.Click += new System.EventHandler(this.buttonUpdate_Click);
@@ -58,7 +57,7 @@
             // insertButton
             // 
             this.insertButton.Enabled = false;
-            this.insertButton.Location = new System.Drawing.Point(200, 147);
+            this.insertButton.Location = new System.Drawing.Point(175, 167);
             this.insertButton.Name = "insertButton";
             this.insertButton.Size = new System.Drawing.Size(67, 30);
             this.insertButton.TabIndex = 19;
@@ -81,7 +80,7 @@
             // radioHand
             // 
             this.radioHand.AutoSize = true;
-            this.radioHand.Location = new System.Drawing.Point(142, 85);
+            this.radioHand.Location = new System.Drawing.Point(184, 85);
             this.radioHand.Name = "radioHand";
             this.radioHand.Size = new System.Drawing.Size(47, 16);
             this.radioHand.TabIndex = 17;
@@ -94,7 +93,7 @@
             // 
             this.lightSet.Font = new System.Drawing.Font("宋体", 200F);
             this.lightSet.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.lightSet.Location = new System.Drawing.Point(50, -118);
+            this.lightSet.Location = new System.Drawing.Point(-106, -32);
             this.lightSet.Name = "lightSet";
             this.lightSet.Size = new System.Drawing.Size(486, 405);
             this.lightSet.TabIndex = 23;

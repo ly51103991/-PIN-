@@ -21,21 +21,21 @@ namespace ComDemoProject
         ArrayList childNumList = new ArrayList();
         SerialPort sp = new SerialPort();
         SerialPort sp2 = new SerialPort();
-      
+        bool vip = false;
         public Form1()
         {   
             InitializeComponent();
         }
-        public Form1(String s)
+        public Form1(bool b)
         {
-            InitializeComponent();                   
+            InitializeComponent();
+            vip = b;
         }
         private void Form1_Load(object sender, EventArgs e)
         {
             sp = SetPort.sp;
             sp2 = SetPort.sp2;
-            buttonUpdate.Visible = true;
-
+            buttonUpdate.Visible = false;
             this.MaximumSize = this.Size;
             this.MinimumSize = this.Size;
             this.MaximizeBox = false;
@@ -44,6 +44,8 @@ namespace ComDemoProject
             // 定义Data Received 事件 ，  当串口收到数据后触发事件
             sp.DataReceived += new SerialDataReceivedEventHandler(sp_DataReceived);
             sp2.DataReceived += new SerialDataReceivedEventHandler(sp2_DataReceived);
+
+            if (vip) buttonUpdate.Visible = vip;
 
         }
          //byte数组转16进制
@@ -135,7 +137,7 @@ namespace ComDemoProject
             }            
             return str;
         }
-        //比较2个byte数组是否一样
+        /*比较2个byte数组是否一样
         public bool CompareArray(byte[] bt1, byte[] bt2)
         {
             if (bt1.Length != bt2.Length)
@@ -148,7 +150,7 @@ namespace ComDemoProject
                     return false;
             }
             return true;
-        }
+        }*/
 
         string dataBasePoints = "";//数据库坐标
         string strs = "";//回复FF的子板号
@@ -178,7 +180,6 @@ namespace ComDemoProject
                         RexvData.Text = machineNum;
                         String sql = "select childNumber,adressNumber from machines where machineId='" + machineNum + "';";
                         MySqlDataReader rder = DataBaseSys.GetDataReaderValue(sql);
-
                         if (rder.Read())
                         {
                             string[] point = rder[1].ToString().Split(',');//4                      
@@ -193,11 +194,25 @@ namespace ComDemoProject
                             if (!Enumerable.SequenceEqual(pointNums, twoPoint))
                             {
                                 MessageBoxButtons messButton1 = MessageBoxButtons.OKCancel;
-                                DialogResult dr1 = MessageBox.Show("该机种与数据库里坐标不一致!需要修改吗?", "提示", messButton1);
+                                DialogResult dr1 = MessageBox.Show("已有该机种，坐标不一致!需要修改吗?", "提示", messButton1);
                                 if (dr1 == DialogResult.OK)//如果点击“确定”按钮
                                 {
-                                    LoginSystem login = new LoginSystem();
-                                    login.ShowDialog();
+                                    string sqlAuto = "update machines set childNumber='" + pointNumber + "' ,adressNumber='" + newStyle + "' where machineId= '" + RexvData.Text + "'";
+                                    DataBaseSys.ExecuteNonQuery(sqlAuto);
+                                    pointNums = twoPoint;
+                                    String sqlUpdate = "select childNumber,adressNumber from machines where machineId='" + RexvData.Text + "';";
+                                    MySqlDataReader rderUpdate = DataBaseSys.GetDataReaderValue(sqlUpdate);
+                                    rder = rderUpdate;
+                                    if (rderUpdate.Read()) { 
+                                    string[] pointUpdate = rderUpdate[1].ToString().Split(',');//4                      
+                                    string pointOldUpdate = "";
+                                    for (int i = 0; i < pointUpdate.Length; i++)
+                                    {
+                                        pointOldUpdate += pointUpdate[i];
+                                    }
+                                    dataBasePoints = pointOldUpdate;
+                                    MessageBox.Show("修改成功！");
+                                    }
                                 }
                             }
                             DataTable dt = new DataTable();
@@ -302,40 +317,43 @@ namespace ComDemoProject
                         if (strs == childRandnum&&RexvData.Text!="")
                         {
                             lightSet.ForeColor = Color.Green;
-                            string machineId = RexvData.Text;                                                          
+                            string machineId = RexvData.Text;
                             string newAdrsssPints = adressPoints.TrimEnd(',');
                             int n = adressPoints.Split(',').Length / 2;
-                            string pointNumber = n> 10 ? n.ToString() : "0" + n;
-                            MessageBoxButtons messButton = MessageBoxButtons.OKCancel;
-                            DialogResult dr = MessageBox.Show("定位成功确定添加吗?", "提示", messButton);
-                            if (dr == DialogResult.OK)//如果点击“确定”按钮
+                            string pointNumber = n > 10 ? n.ToString() : "0" + n;
+                            String sqlHandMes = "select id from machines where machineId='" + RexvData.Text + "';";
+                            MySqlDataReader msdrHand=DataBaseSys.GetDataReaderValue(sqlHandMes);
+                            if (msdrHand.HasRows)
                             {
-                                    string addSql = "insert into machines(machineId,childNumber,adressNumber) values('" + machineId + "','" + pointNumber + "','" + newAdrsssPints + "')";
-                                DataBaseSys.ExecuteNonQuery(addSql);
-                                adressPoints = "";
-                                MessageBoxButtons messButtonAdd = MessageBoxButtons.OKCancel;
-                                DialogResult dr2=MessageBox.Show("添加成功！还需要手动添加新机种吗？","提示", messButtonAdd);
-                                if (dr2 == DialogResult.OK)
-                                {
-                                    radioHand_MouseClick(null, null);
-                                    buttonUpdate.Enabled = false;
-                                    insertButton.Enabled = false;
-                                }
-                                else radioAuto.Checked = true;
+                                MessageBoxButtons ButtonHandAdress = MessageBoxButtons.OKCancel;
+                                DialogResult drHand = MessageBox.Show("定位成功，存在相关的机种其坐标不一致，需要修改吗？", "提示", ButtonHandAdress);
+                                if (drHand == DialogResult.OK) { 
+                                string sql = "update machines set childNumber='" + pointNumber + "' ,adressNumber='" + newAdrsssPints + "' where machineId= '" + RexvData.Text + "'";
+                                DataBaseSys.ExecuteNonQuery(sql);
+                                MessageBox.Show("修改成功！");
+                                                               }
                             }
                             else
+                            {                         
+                            MessageBoxButtons messButton = MessageBoxButtons.OKCancel;
+                            DialogResult dr = MessageBox.Show("定位成功，无相关的机种，确定添加吗?", "提示", messButton);
+                            if (dr == DialogResult.OK)//如果点击“确定”按钮
                             {
-                                adressPoints = "";
-                                MessageBoxButtons messButtonFalse = MessageBoxButtons.OKCancel;
-                                DialogResult drFalse = MessageBox.Show("取消成功！重新手动添加新机种吗？", "提示", messButtonFalse);
-                                if (drFalse == DialogResult.OK)
-                                {
-                                    radioHand_MouseClick(null, null);
-                                    buttonUpdate.Enabled = false;
-                                    insertButton.Enabled = false;
-                                }
-                                else radioAuto.Checked = true;
+                                string addSql = "insert into machines(machineId,childNumber,adressNumber) values('" + machineId + "','" + pointNumber + "','" + newAdrsssPints + "')";
+                                DataBaseSys.ExecuteNonQuery(addSql);
+                                
+                            }                                
                             }
+                            adressPoints = "";
+                            MessageBoxButtons messButtonAdd = MessageBoxButtons.OKCancel;
+                            DialogResult dr2 = MessageBox.Show("需要继续手动添加新机种吗？", "提示", messButtonAdd);
+                            if (dr2 == DialogResult.OK)
+                            {
+                                radioHand_MouseClick(null, null);
+                                buttonUpdate.Enabled = false;
+                                insertButton.Enabled = false;
+                            }
+                            else radioAuto.Checked = true;
                         }
                     }
                 }
@@ -441,9 +459,9 @@ namespace ComDemoProject
             }
             else
             {
-                string sql = "SELECT id FROM machines WHERE machineId='" + RexvData.Text + "'";
-                MySqlDataReader msdr = DataBaseSys.GetDataReaderValue(sql);
-                if (!msdr.HasRows) { 
+               // string sql = "SELECT id FROM machines WHERE machineId='" + RexvData.Text + "'";
+               // MySqlDataReader msdr = DataBaseSys.GetDataReaderValue(sql);
+               // if (!msdr.HasRows) { 
                 for (int i = 0; i < strs.Length; i++) //strs共享的板子数据编号
                 {
                     System.Threading.Thread.Sleep(2000);
@@ -451,8 +469,8 @@ namespace ComDemoProject
                 byte[] bt = hexToString(po.getConnOrder());
                 sp2.Write(bt, 0, bt.Length);
                 }
-                }
-                else MessageBox.Show("机种号重复，请重新输入机种号！");
+              //  }
+                //else MessageBox.Show("机种号重复，请重新输入机种号！");
             }
         }
 
@@ -489,8 +507,8 @@ namespace ComDemoProject
 
         private void buttonUpdate_Click(object sender, EventArgs e)
         {
-            LoginSystem login = new LoginSystem();
-            login.ShowDialog();
+            ManagerSystem mana = new ManagerSystem();
+            mana.ShowDialog();
         }
     }
     }

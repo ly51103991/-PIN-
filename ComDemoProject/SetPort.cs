@@ -284,9 +284,21 @@ namespace ComDemoProject
             SetPortProperty2();
             sp.Open();
             sp2.Open();
-            Form1 f = new Form1();
-            this.Visible = false;
-            f.ShowDialog();         
+                MessageBoxButtons ButtonVipLogin = MessageBoxButtons.OKCancel;
+                DialogResult drLogin = MessageBox.Show("是否以管理员身份登录？", "提示", ButtonVipLogin);
+                if (drLogin == DialogResult.OK)
+                {
+                    LoginSystem login = new LoginSystem();
+                    this.Hide();
+                    login.ShowDialog();
+                }
+                else
+                {
+                    Form1 f = new Form1();
+                    this.Hide();
+                    f.ShowDialog();
+                }
+            this.Visible = false;       
             this.Close();
             }
             else MessageBox.Show("串口打开冲突！");

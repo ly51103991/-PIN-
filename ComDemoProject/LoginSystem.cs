@@ -34,10 +34,12 @@ namespace ComDemoProject
                     }
                     else
                     {
-                        this.Close();
-                    ManagerSystem um = new ManagerSystem();
-                    MessageBox.Show("双击需要修改的坐标区域即可修改其中坐标地址！");
-                    um.ShowDialog();
+                    this.Hide();
+                   Form1 f1 = new Form1(true);
+                   f1.ShowDialog();
+                   // ManagerSystem um = new ManagerSystem();
+                    //MessageBox.Show("双击需要修改的坐标区域即可修改其中坐标地址！");
+                    //um.ShowDialog();
                     }
                 }
                 else
