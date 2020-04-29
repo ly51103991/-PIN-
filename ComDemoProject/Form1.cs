@@ -35,7 +35,7 @@ namespace ComDemoProject
         {
             sp = SetPort.sp;
             sp2 = SetPort.sp2;
-            buttonUpdate.Visible = false;
+
             this.MaximumSize = this.Size;
             this.MinimumSize = this.Size;
             this.MaximizeBox = false;
@@ -45,8 +45,8 @@ namespace ComDemoProject
             sp.DataReceived += new SerialDataReceivedEventHandler(sp_DataReceived);
             sp2.DataReceived += new SerialDataReceivedEventHandler(sp2_DataReceived);
 
+            buttonUpdate.Visible = false;
             if (vip) buttonUpdate.Visible = vip;
-
         }
          //byte数组转16进制
         public  static string  byteToHexString(byte[] rd)
@@ -58,7 +58,6 @@ namespace ComDemoProject
             }
             return sb.ToString().ToUpper();
         }
-
          //完成子板号与坐标对应方法
          public static string[] getChildNum(string[] str)
            {
@@ -99,8 +98,7 @@ namespace ComDemoProject
                 }
             }                     
             return newStr;                           
-    }
-        
+    }        
         //将超过19的y坐标解析方法（参数是带坐标的数据）
         public string childToPcPointChange(byte[] bty)
         {
@@ -253,9 +251,6 @@ namespace ComDemoProject
                             DialogResult dr = MessageBox.Show("这是新机种!确定要添加吗?", "提示", messButton);
                             if (dr == DialogResult.OK)//如果点击“确定”按钮
                             {
-                                //machineNum = ds.Substring(0, 10);
-                                // adressPoint = ds.Substring(12, ds.Length - 12);
-                                // newStyle = Regex.Replace(adressPoint, @"(\w{2})", "$1,").Trim(',');
                                 try
                                 {
                                     string addSql = "insert into machines(machineId,childNumber,adressNumber) values('" + machineNum + "','" + pointNumber + "','" + newStyle + "')";
@@ -451,17 +446,13 @@ namespace ComDemoProject
             return btr;
         }
         private void insertButton_Click(object sender, EventArgs e)
-        {
-          
+        {       
             if (RexvData.Text == "")
             {
                 MessageBox.Show("机种号不能为空！请输入机种号");
             }
             else
             {
-               // string sql = "SELECT id FROM machines WHERE machineId='" + RexvData.Text + "'";
-               // MySqlDataReader msdr = DataBaseSys.GetDataReaderValue(sql);
-               // if (!msdr.HasRows) { 
                 for (int i = 0; i < strs.Length; i++) //strs共享的板子数据编号
                 {
                     System.Threading.Thread.Sleep(2000);
@@ -469,16 +460,9 @@ namespace ComDemoProject
                 byte[] bt = hexToString(po.getConnOrder());
                 sp2.Write(bt, 0, bt.Length);
                 }
-              //  }
-                //else MessageBox.Show("机种号重复，请重新输入机种号！");
             }
         }
 
-        private void buttonGoSystem_Click(object sender, EventArgs e)
-        {
-            ManagerSystem ms = new ManagerSystem();
-            ms.ShowDialog();
-        }
         private void radioHand_MouseClick(object sender, MouseEventArgs e)
         {
             strs = "";
@@ -492,12 +476,10 @@ namespace ComDemoProject
                     sp2.Write(bt, 0, bt.Length);
                 }
             RexvData.ReadOnly = false;
-            buttonUpdate.Enabled = true;
             insertButton.Enabled = true;
         }
         private void radioAuto_MouseClick(object sender, MouseEventArgs e)
         {
-            buttonUpdate.Enabled = false;
             insertButton.Enabled = false;
             strs = "";
             RexvData.ReadOnly = true;
