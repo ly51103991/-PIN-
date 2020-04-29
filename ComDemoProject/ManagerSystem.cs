@@ -15,7 +15,6 @@ namespace ComDemoProject
 {
     public partial class ManagerSystem : Form
     {
-        Form1 form = new Form1();
         public ManagerSystem()
         {
             InitializeComponent();
@@ -176,12 +175,6 @@ namespace ComDemoProject
                 return;
             }
         }
-
-        private void buttonGet_Click(object sender, EventArgs e)
-        {
-          //  string sql = "select * from users where user";
-        }
-
         private void buttonAdd_Click(object sender, EventArgs e)
         {
             usersManager um = new usersManager();
@@ -254,14 +247,14 @@ namespace ComDemoProject
             string machineGet = textMessage.Text;
             string sql = "select * from machines where machineId like'"+ machineGet+"%'";
             DataSet dsMoHu = DataBaseSys.GetDataSetValue(sql, "Tables");
-            adressDataView.DataSource = dsMoHu.Tables[0];
+            adressDataView.DataSource = dsMoHu.Tables[0];           
+            if (machineGet == ""||textMessage.ForeColor==SystemColors.InactiveCaption)
+            {
+                ManagerSystem_Load(null, null);
+            }
             if (adressDataView.Rows.Count == 0)
             {
                 MessageBox.Show("无相似机种！");
-            }
-            if (machineGet == "")
-            {
-                ManagerSystem_Load(null, null);
             }
         }
     }

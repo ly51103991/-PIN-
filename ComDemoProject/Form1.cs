@@ -195,6 +195,9 @@ namespace ComDemoProject
                                 DialogResult dr1 = MessageBox.Show("已有该机种，坐标不一致!需要修改吗?", "提示", messButton1);
                                 if (dr1 == DialogResult.OK)//如果点击“确定”按钮
                                 {
+                                    if (!vip) MessageBox.Show("您没有管理员权限无法修改！");
+                                    else
+                                    {
                                     string sqlAuto = "update machines set childNumber='" + pointNumber + "' ,adressNumber='" + newStyle + "' where machineId= '" + RexvData.Text + "'";
                                     DataBaseSys.ExecuteNonQuery(sqlAuto);
                                     pointNums = twoPoint;
@@ -210,6 +213,7 @@ namespace ComDemoProject
                                     }
                                     dataBasePoints = pointOldUpdate;
                                     MessageBox.Show("修改成功！");
+                                    }
                                     }
                                 }
                             }
@@ -248,7 +252,7 @@ namespace ComDemoProject
                         else
                         {
                             MessageBoxButtons messButton = MessageBoxButtons.OKCancel;
-                            DialogResult dr = MessageBox.Show("这是新机种!确定要添加吗?", "提示", messButton);
+                            DialogResult dr = MessageBox.Show("检测到是新机种!确定添加吗?", "提示", messButton);
                             if (dr == DialogResult.OK)//如果点击“确定”按钮
                             {
                                 try
@@ -322,11 +326,14 @@ namespace ComDemoProject
                             {
                                 MessageBoxButtons ButtonHandAdress = MessageBoxButtons.OKCancel;
                                 DialogResult drHand = MessageBox.Show("定位成功，存在相关的机种其坐标不一致，需要修改吗？", "提示", ButtonHandAdress);
-                                if (drHand == DialogResult.OK) { 
-                                string sql = "update machines set childNumber='" + pointNumber + "' ,adressNumber='" + newAdrsssPints + "' where machineId= '" + RexvData.Text + "'";
-                                DataBaseSys.ExecuteNonQuery(sql);
-                                MessageBox.Show("修改成功！");
-                                                               }
+                                if (drHand == DialogResult.OK) {
+                                    if (!vip) MessageBox.Show("您没有管理员权限无法修改！");
+                                    else
+                                    {
+                                        string sql = "update machines set childNumber='" + pointNumber + "' ,adressNumber='" + newAdrsssPints + "' where machineId= '" + RexvData.Text + "'";
+                                        DataBaseSys.ExecuteNonQuery(sql);
+                                        MessageBox.Show("修改成功！");
+                                    }                                                              }
                             }
                             else
                             {                         
@@ -336,8 +343,8 @@ namespace ComDemoProject
                             {
                                 string addSql = "insert into machines(machineId,childNumber,adressNumber) values('" + machineId + "','" + pointNumber + "','" + newAdrsssPints + "')";
                                 DataBaseSys.ExecuteNonQuery(addSql);
-                                
-                            }                                
+                                MessageBox.Show("添加成功！");
+                                }                                
                             }
                             adressPoints = "";
                             MessageBoxButtons messButtonAdd = MessageBoxButtons.OKCancel;
