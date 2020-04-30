@@ -279,7 +279,7 @@ namespace ComDemoProject
 
         private void ok_Order_Click(object sender, EventArgs e)
         {
-            if (obxComPort.Text != obxComPort2.Text) {  
+            if (obxComPort.Text != obxComPort2.Text&&obxComPort.Text!=""||obxComPort2.Text!="") {  
             SetPortProperty();
             SetPortProperty2();
             sp.Open();
@@ -301,7 +301,7 @@ namespace ComDemoProject
             this.Visible = false;       
             this.Close();
             }
-            else MessageBox.Show("串口打开冲突！");
+            else MessageBox.Show("串口打开冲突或为空！");
         }
     }
    
