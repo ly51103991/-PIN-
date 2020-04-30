@@ -19,7 +19,6 @@ namespace ComDemoProject
         {
             InitializeComponent();
         }
-
         private void ManagerSystem_Load(object sender, EventArgs e)
         {          
             this.tabControl1.SelectedIndex = 1;
@@ -254,7 +253,7 @@ namespace ComDemoProject
             }
             if (adressDataView.Rows.Count == 0)
             {
-                MessageBox.Show("无相似机种！");
+                MessageBox.Show("无类似机种！");
             }
         }
     }

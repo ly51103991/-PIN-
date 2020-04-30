@@ -45,7 +45,7 @@
             // 
             // buttonUpdate
             // 
-            this.buttonUpdate.Location = new System.Drawing.Point(274, 167);
+            this.buttonUpdate.Location = new System.Drawing.Point(259, 167);
             this.buttonUpdate.Name = "buttonUpdate";
             this.buttonUpdate.Size = new System.Drawing.Size(67, 30);
             this.buttonUpdate.TabIndex = 20;
@@ -118,7 +118,7 @@
             this.dataAdressView1.Location = new System.Drawing.Point(6, 17);
             this.dataAdressView1.Name = "dataAdressView1";
             this.dataAdressView1.RowTemplate.Height = 23;
-            this.dataAdressView1.Size = new System.Drawing.Size(291, 87);
+            this.dataAdressView1.Size = new System.Drawing.Size(285, 87);
             this.dataAdressView1.TabIndex = 0;
             // 
             // timer1
