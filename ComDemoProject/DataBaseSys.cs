@@ -22,7 +22,7 @@ namespace DataConn
         //打开数据库连接
         public static void OpenConn()
         {
-            string SqlCon = "server=localhost;user id=root;password = 123456;database=adress";
+            string SqlCon = "server=localhost;user id=root;password = plo321;database=adress";
             conn = new MySqlConnection(SqlCon);
             conn.Open();
         }

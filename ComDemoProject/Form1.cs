@@ -316,6 +316,24 @@ namespace ComDemoProject
                         if (strs == childRandnum&&RexvData.Text!="")
                         {
                             lightSet.ForeColor = Color.Green;
+                            string pointDingWei = "";
+                            for (int i = 0; i < adressPoints.Split(',').Length; i++)
+                            {
+                                pointDingWei += adressPoints.Split(',')[i];
+                            }
+                            string[] pointDingWeiStrs = Regex.Replace(pointDingWei, @"(\w{4})", "$1,").Trim(',').Split(',');
+                            DataTable dt = new DataTable();
+                            dt.Rows.Add();
+                            for (int i = 0; i < pointDingWeiStrs.Length; i++)
+                            {
+                                dt.Columns.Add("P" + (i + 1), System.Type.GetType("System.String"));
+                                dt.Rows[0][i] = pointDingWeiStrs[i];
+                            }
+                            DataSet ds2 = new DataSet();
+                            ds2.Tables.Add(dt);
+                            //sda.Fill(ds2);
+                            dataAdressView1.DataSource = ds2.Tables[0];
+                            dataAdressView1.ReadOnly = true;
                             string machineId = RexvData.Text;
                             string newAdrsssPints = adressPoints.TrimEnd(',');
                             int n = adressPoints.Split(',').Length / 2;
@@ -351,9 +369,8 @@ namespace ComDemoProject
                             DialogResult dr2 = MessageBox.Show("需要继续手动添加新机种吗？", "提示", messButtonAdd);
                             if (dr2 == DialogResult.OK)
                             {
-                                radioHand_MouseClick(null, null);
-                                buttonUpdate.Enabled = false;
                                 insertButton.Enabled = false;
+                                radioHand_MouseClick(null, null);                              
                             }
                             else radioAuto.Checked = true;
                         }
@@ -474,6 +491,8 @@ namespace ComDemoProject
         {
             strs = "";
             childRandnum = "";
+            timer1.Stop();
+            timer1.Enabled = false;
             lightSet.ForeColor = Color.Black;
                 for (int i = 1; i < 9; i++)
                 {
@@ -488,6 +507,8 @@ namespace ComDemoProject
         private void radioAuto_MouseClick(object sender, MouseEventArgs e)
         {
             insertButton.Enabled = false;
+            timer1.Stop();
+            timer1.Enabled=false;
             strs = "";
             RexvData.ReadOnly = true;
             RexvData.Text = "";
