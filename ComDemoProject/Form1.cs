@@ -187,7 +187,7 @@ namespace ComDemoProject
                                 pointOld += point[i];
                             }
                             dataBasePoints = pointOld;
-                            string[] pointNums = Regex.Replace(pointOld, @"(\w{4})", "$1,").Trim(',').Split(',');                          
+                            string[] pointNums = Regex.Replace(pointOld, @"(\w{4})", "$1,").Trim(',').Split(',');
                             string[] twoPoint = Regex.Replace(adressPoint, @"(\w{4})", "$1,").Trim(',').Split(',');
                             if (!Enumerable.SequenceEqual(pointNums, twoPoint))
                             {
@@ -198,22 +198,23 @@ namespace ComDemoProject
                                     if (!vip) MessageBox.Show("您没有管理员权限无法修改！");
                                     else
                                     {
-                                    string sqlAuto = "update machines set childNumber='" + pointNumber + "' ,adressNumber='" + newStyle + "' where machineId= '" + RexvData.Text + "'";
-                                    DataBaseSys.ExecuteNonQuery(sqlAuto);
-                                    pointNums = twoPoint;
-                                    String sqlUpdate = "select childNumber,adressNumber from machines where machineId='" + RexvData.Text + "';";
-                                    MySqlDataReader rderUpdate = DataBaseSys.GetDataReaderValue(sqlUpdate);
-                                    rder = rderUpdate;
-                                    if (rderUpdate.Read()) { 
-                                    string[] pointUpdate = rderUpdate[1].ToString().Split(',');//4                      
-                                    string pointOldUpdate = "";
-                                    for (int i = 0; i < pointUpdate.Length; i++)
-                                    {
-                                        pointOldUpdate += pointUpdate[i];
-                                    }
-                                    dataBasePoints = pointOldUpdate;
-                                    MessageBox.Show("修改成功！");
-                                    }
+                                        string sqlAuto = "update machines set childNumber='" + pointNumber + "' ,adressNumber='" + newStyle + "' where machineId= '" + RexvData.Text + "'";
+                                        DataBaseSys.ExecuteNonQuery(sqlAuto);
+                                        pointNums = twoPoint;
+                                        String sqlUpdate = "select childNumber,adressNumber from machines where machineId='" + RexvData.Text + "';";
+                                        MySqlDataReader rderUpdate = DataBaseSys.GetDataReaderValue(sqlUpdate);
+                                        rder = rderUpdate;
+                                        if (rderUpdate.Read())
+                                        {
+                                            string[] pointUpdate = rderUpdate[1].ToString().Split(',');//4                      
+                                            string pointOldUpdate = "";
+                                            for (int i = 0; i < pointUpdate.Length; i++)
+                                            {
+                                                pointOldUpdate += pointUpdate[i];
+                                            }
+                                            dataBasePoints = pointOldUpdate;
+                                            MessageBox.Show("修改成功！");
+                                        }
                                     }
                                 }
                             }
@@ -259,16 +260,17 @@ namespace ComDemoProject
                                 {
                                     string addSql = "insert into machines(machineId,childNumber,adressNumber) values('" + machineNum + "','" + pointNumber + "','" + newStyle + "')";
                                     DataBaseSys.ExecuteNonQuery(addSql);
-                                    MessageBox.Show("添加成功！");
+                                    MessageBox.Show("添加成功！请重新扫描。");
                                 }
                                 catch (Exception)
                                 {
                                     MessageBox.Show("添加失败！");
                                 }
                             }
+                            else {RexvData.Text = ""; dataAdressView1.DataSource = new DataTable(); }
                             sp.DiscardInBuffer();
                         }
-                }
+                    }
                 }
                 catch (Exception x)
                 {
@@ -281,7 +283,7 @@ namespace ComDemoProject
             //定时向子板发送05自动读取命令以收到错误坐标指令
             for (int i = 0; i < childNumList.Count; i++)
             {
-                //System.Threading.Thread.Sleep(2000);
+                System.Threading.Thread.Sleep(500);
                 PortOrder po = new PortOrder(Direction.AB, "05", childNumList[i].ToString(), "", "");
                 sp2.Write(hexToString(po.getConnOrder()), 0, hexToString(po.getConnOrder()).Length);
             }
@@ -343,7 +345,7 @@ namespace ComDemoProject
                             if (msdrHand.HasRows)
                             {
                                 MessageBoxButtons ButtonHandAdress = MessageBoxButtons.OKCancel;
-                                DialogResult drHand = MessageBox.Show("定位成功，存在相关的机种其坐标不一致，需要修改吗？", "提示", ButtonHandAdress);
+                                DialogResult drHand = MessageBox.Show("定位成功，存在相关的机种，需要修改吗？", "提示", ButtonHandAdress);
                                 if (drHand == DialogResult.OK) {
                                     if (!vip) MessageBox.Show("您没有管理员权限无法修改！");
                                     else
@@ -380,13 +382,12 @@ namespace ComDemoProject
                 else
                 {
                     b++;
-                    if (rb[3] == 0X00)//纠错成功恢复00（05）
+                    if (rb[3] == 0X00)//纠错成功回复00（05）
                     {
                         childNumList.Remove("0" + rb[2]);
                         b = b - 1;                    
                         if (childNumList.Count==0)
                         {
-                            MessageBox.Show("STOP");
                             for (int k = 0; k < dataAdressView1.ColumnCount; k++)
                             {
                                 dataAdressView1.Rows[0].Cells[k].Style.ForeColor = Color.Black;                                                                                              
@@ -435,7 +436,6 @@ namespace ComDemoProject
                         {
                             s+= item.ToString()+",";
                         }
-                        MessageBox.Show("进入改颜色,相同的部分有"+s);
                         for (int k = 0; k < dataAdressView1.ColumnCount; k++)
                         {
                             //string strData = dataAdressView1[j, 0].Value.ToString();
