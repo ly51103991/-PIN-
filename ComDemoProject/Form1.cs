@@ -93,7 +93,6 @@ namespace ComDemoProject
                         case 7: newStr[6] += (xPoint + yPpoint); break;
                         case 8: newStr[7] += (xPoint + yPpoint); break;
                        default:                                  break;
-
                     }
                 }
             }                     
